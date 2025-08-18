@@ -1,0 +1,148 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Role{
+  USER
+  ADMIN
+  SELLER
+}
+model User {
+  id String  @id @default(cuid())
+  email String? @unique
+  name String?
+  emailVerified DateTime?
+  image String?
+  createdAt DateTime @default(now())
+
+  password String?
+  verificationToken String?
+  tokenExpiry DateTime?
+  role Role?
+
+  accounts Account[]
+  ads Property[]
+}
+model Account {
+  id String  @id @default(cuid())
+  userId String
+  type String
+  provider String
+  providerAccountId String?
+  refresh_token String?
+  access_token String?
+  expires_at Int?
+  token_type String?
+  scope String?
+  id_token String?
+  session_state String?
+  
+  user User @relation(fields: [userId],references: [id])
+  @@unique([provider,providerAccountId])
+
+}
+
+enum PropertyCategory{
+  LAND
+  HOUSE
+  AGRICULTURAL
+}
+enum PURPOSE{
+  RENT 
+  SALE 
+  LEASE
+}
+enum STATUS {
+  AVAILABLE
+  SOLD
+  RENTED
+  LEASED  
+}
+
+model Property {
+  id String  @id @default(cuid())
+  title String?
+  description String?
+  videos String[]
+  images String[]
+  price Json
+  purpose PURPOSE
+  status STATUS
+  propertyCategory PropertyCategory
+
+  location Location @relation(fields: [locationId],references: [id])
+  locationId String
+  
+  userId String
+  user User @relation(fields: [userId],references: [id])
+
+  land LandProperty?
+  house HouseProperty?
+  agricultural AgriculturalProperty?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+enum ZONING{
+  Residential
+  Commercial
+  Industrial
+  Other
+}
+model LandProperty {
+  id String @id @default(cuid())
+  area Json
+  dimensions Json
+  zoning  ZONING
+  isDeveloped  Boolean
+  accessRoad   Boolean
+
+  property     Property @relation(fields: [propertyId], references: [id])
+  propertyId   String   @unique
+}
+model HouseProperty {
+  id String  @id @default(cuid())
+  area Json
+  dimensions Json
+  bedrooms     Int
+  bathrooms    Int
+  kitchen      Int
+  floors       Int
+  parking      Boolean
+  servantRoom  Boolean
+  lawn         Boolean
+
+  property     Property @relation(fields: [propertyId], references: [id])
+  propertyId   String   @unique
+}
+model AgriculturalProperty{
+  id String @id @default(cuid())
+  area Json
+  dimensions Json
+  soilType      String?
+  irrigation    String? 
+  topography    String?
+  tenure        String?
+  cropHistory   Json?
+
+  property     Property @relation(fields: [propertyId], references: [id])
+  propertyId   String   @unique
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  province  String
+  city      String
+  area      String
+  address   String
+  latitude  Float?
+  longitude Float?
+  properties Property[]
+}
