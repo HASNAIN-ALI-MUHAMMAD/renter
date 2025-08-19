@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import {Roboto} from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 
@@ -8,10 +7,6 @@ export const metadata: Metadata = {
   description: "By Hasnain",
 };
 
-const roboto = Roboto({
-  weight: '400',
-  subsets: ['latin'],
-})
 
 export default function RootLayout({
   children,
@@ -19,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={roboto.className}>
+    <html lang="en">
     <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
       <body>
         {children}

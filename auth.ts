@@ -17,25 +17,30 @@ export const {handlers ,signIn,signOut,auth} = NextAuth({
           name:"Credentials",
           credentials:{
             email:{label:"Email",type:"text",placeholder:"email"},
-            password:{label:"Password",type:"password"}
+            password:{label:"Password",type:"password"},
           },
           async authorize(credentials:Partial<Record<"email" | "password",unknown>>, request:Request) {
-            const credentialsValidation = credentialsZod.safeParse(credentials);
-            if(!credentialsValidation.success || !credentials.email){
-                return null;
+            try {
+                const credentialsValidation = credentialsZod.safeParse(credentials);
+                if(!credentialsValidation.success || !credentials.email){
+                    throw new Error("Invalid credentials");
+                }
+                const user = await prisma.user.findFirst({
+                  where:{email:credentials.email},
+                });
+                if(user) return {
+                    id:user.id,
+                    name:user.name || "",
+                    email:user.email,
+                    role:user.role,
+                    image:user.image || null,
+                }
+                else throw new Error("User not found");
+              
+            } catch (err) {
+              console.error(err)
+              throw err
             }
-            const user = await prisma.user.findFirst({
-              where:{email:credentials?.email},
-            });
-            if(user) return {
-                id:user.id,
-                name:user.name || "",
-                email:user.email,
-                role:user.role || "",
-                image:user.image || null,
-            }
-            else return null
-
         }
           }),
         Google({
@@ -55,13 +60,22 @@ export const {handlers ,signIn,signOut,auth} = NextAuth({
       async jwt({ token, user }) {
         if (user) {
           token.id = user.id ??"";
-          token.role = user.role ?? "user";
+          token.role = user.role;
         }
         return token;
       },
-      async session({ session, token }) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+      async session({ session }) {
+        const user = await prisma.user.findFirst({
+          where:{
+            email:session.user.email || undefined
+          },
+          select:{id:true,role:true,emailVerified:true}
+        })
+        if(user){
+          session.user.id = user.id;
+          session.user.role = user.role;
+          session.user.emailVerified = user.emailVerified
+        }
         return session;
       }
     },
@@ -80,6 +94,5 @@ export const {handlers ,signIn,signOut,auth} = NextAuth({
                 })
             }
             console.log("User: ",user.email," updated!")
-        }
-        }
+        }},
 })

@@ -4,9 +4,8 @@ import ButtonGroup from "@mui/material/ButtonGroup"
 import Button from "@mui/material/Button"
 import { spData } from "../utils/auth_utils"
 import { siData } from "../utils/auth_utils"
-import { validateSignUp } from "../utils/auth_utils"
 import { validateSignIn } from "../utils/auth_utils"
-
+import { validateSignUp } from "../utils/auth_utils"
 
 export default function CustomAuth(){
     const [formState,setFormState] = useState("signUp")
@@ -71,9 +70,11 @@ function SignUp(){
         try {
             const res = Promise.resolve(validateSignUp(data))
             res.then((data)=>{
+                console.log(data)
                 if(data.error) return alert(data.error)
                 else if(data.message) return alert(data.message)
             })
+        console.log(res)
         } catch (err) {
             console.log(err)
         }
@@ -86,7 +87,6 @@ function SignUp(){
             [e.target.name as keyof spData]:e.target.value
         })
     }
-    console.log(spData)
 
     return(
         <div className="w-full h-full p-2">

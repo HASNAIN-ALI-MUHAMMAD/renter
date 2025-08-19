@@ -1,6 +1,7 @@
 import { signOut, useSession } from "next-auth/react"
 import Image from "next/image";
 import { TopBarButton } from "./TopBar";
+import { CircleUserRound } from "lucide-react";
 
 export function UserComp(){
 
@@ -17,11 +18,15 @@ export function UserComp(){
     }
     else{
         return(
-            <div className="flex flex-row items-center gap-2">
-                <Image src={session?.user.image || ""} alt="profile" width="30" height="30" className="rounded-full w-10"/>
+            <div className="flex flex-row items-center gap-2 justify-center">
+                {
+                    session?.user.image !== null ? 
+                <Image src={session?.user.image || ""} alt="profile" width="30" height="30" className="rounded-full w-10"/>:
+                <CircleUserRound/>
+                }
                 <div className="flex flex-col mt-2">
-                    <p>{session?.user.name || "Not found!"}</p>
                     <p>{session?.user.email || "Not Found!"}</p>
+                    <p>{session?.user.emailVerified ? session.user.emailVerified.toString() : "Unverified"}</p>
                 </div>
                 <TopBarButton link="" onClick={()=>signOut({redirect:true})}>Sign Out</TopBarButton>
 

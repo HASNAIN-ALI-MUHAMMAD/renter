@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto"
 import bcrypt from "bcrypt"
 import { Role } from "@prisma/client";
-import { bodyZod } from "@/app/api/(utils)/schemasZod/signupZod";
+import { bodyZodSignUp } from "@/app/api/(utils)/schemasZod/signupZod";
 
 
 export  async function POST(req:NextRequest) {
     try {
         // safe parsing the body with zod
         const body = await req.json()
-        const parseZodBody  = await bodyZod.safeParse(body)
+        const parseZodBody  = await bodyZodSignUp.safeParse(body)
         if(!parseZodBody.success){
             return NextResponse.json({error:parseZodBody.error.message,status:400})
         }
@@ -37,7 +37,8 @@ export  async function POST(req:NextRequest) {
                     password:hashedPassword,
                     verificationToken:verificationToken,
                     tokenExpiry:tokenExpiry,
-                    role:Role.USER
+                    role:Role.USER,
+                    emailVerified:null
                 }
             })
             return NextResponse.json({message:"continue",status:200,account:newUser})
