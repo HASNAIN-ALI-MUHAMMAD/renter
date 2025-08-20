@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { propertyMI,HouseI,LandI,AgriculturalI } from "@/app/utils/forms_utils";
+import { propertyMI,HouseI,LandI,AgriculturalI } from "../../(utils)/utils/forms_utils";
 import BaseForm from "./steps/BasicForm";
 import HouseStep from "./steps/HouseForm";
 import LandStep from "./steps/LandForm";
@@ -86,7 +86,7 @@ export default function PropertyForm() {
   };
 
   return (
-    <div className="w-3/4 min-h-120 h-max bg-gray-500 rounded-2xl p-6 shadow-lg text-gray-900">
+    <div className="w-full min-h-120 h-max bg-gray-500 rounded-2xl p-6 shadow-lg text-gray-900">
       <h2 className="text-2xl font-semibold mb-4">Property Listing</h2>
       <p className="mb-6">Step {step} of 3</p>
 

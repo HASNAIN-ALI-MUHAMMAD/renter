@@ -3,6 +3,8 @@ import { TopBarButton } from "../../(utils)/components/TopBar";
 import clsx from "clsx";
 import { ChevronDown } from "lucide-react";
 import { set } from "zod";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 
 export enum STATE {
@@ -19,15 +21,21 @@ export enum EXTRAS{
 }
 
 export default function LeftBar({setValue,value}:{value:string,setValue:React.Dispatch<React.SetStateAction<string>>}){
+    const router = useRouter()
     const handleExtraClick = (val:string)=>{
         return setValue(val)
     }
     return(
-        <div className="flex flex-col gap-2 p-2 bg-gray-600 rounded-sm ">
-            <TopBarButton  onClick={()=>setValue("profile")}>Profile</TopBarButton>
-            <TopBarButton  onClick={()=>setValue("settings")}>Settings</TopBarButton>
-            <TopBarButton  onClick={()=>setValue("ads")}>Advertisements</TopBarButton>
-            <LeftBarButtonGroup onClick={(val)=>handleExtraClick(val)} value={value}/>
+        <div className="flex flex-col justify-items-end h-full items-center p-2">
+            <div className="flex flex-col gap-2 p-2 bg-gray-600 rounded-sm ">
+                <TopBarButton  onClick={()=>setValue("profile")}>Profile</TopBarButton>
+                <TopBarButton  onClick={()=>setValue("settings")}>Settings</TopBarButton>
+                <TopBarButton  onClick={()=>setValue("ads")}>Advertisements</TopBarButton>
+                <LeftBarButtonGroup onClick={(val)=>handleExtraClick(val)} value={value}/>
+            </div>
+            <div className="">
+                <TopBarButton onClick={()=>signOut({redirect:false}).then(()=>router.push('/auth/login'))}>SignOut</TopBarButton>
+            </div>
         </div>
     )
 }
@@ -62,7 +70,6 @@ export function LeftBarButtonGroup({onClick,value}:{onClick:(value:string)=>void
                         }}>Wow this one worked!</TopBarButton>
                 </div>
                 }
-
         </div>
     )
 }

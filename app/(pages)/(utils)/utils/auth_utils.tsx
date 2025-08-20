@@ -1,6 +1,5 @@
 import { signIn } from "next-auth/react"
 
-
 export type spData = {
     email:string,
     password:string,
@@ -39,7 +38,7 @@ export async function validateSignIn(data:siData){
     }
 }
 
-export async function validateSignUp(data:spData) {
+export async function validateSignUp(data:spData,redirect:()=>void) {
     const {email,password,confirmPassword} = data
     if(email ==="") return {error:"Email field left empty!"}
     if(password === "") return {error:"Password field left empty!"}
@@ -61,6 +60,7 @@ export async function validateSignUp(data:spData) {
         else if(res.status===200 && dataFetch.message === "continue"&& dataFetch.account){
             const res = await signIn("credentials",{email,password,redirect:false})
             if(res.error) return {error:res.error,res:res}
+            else if(res.ok) redirect()
             return {message:"Account created successfully! Verify your email now!"}
         }
         return {message:"Something unexpected happened!"} 

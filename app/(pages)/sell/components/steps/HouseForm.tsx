@@ -1,4 +1,4 @@
-import { HouseI } from "@/app/utils/forms_utils";
+import { HouseI } from "@/app/(pages)/(utils)/utils/forms_utils";
 
 
 export default function HouseStep({

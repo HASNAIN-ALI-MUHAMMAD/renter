@@ -34,6 +34,7 @@ export const {handlers ,signIn,signOut,auth} = NextAuth({
                     email:user.email,
                     role:user.role,
                     image:user.image || null,
+                    emailVerified:user.emailVerified
                 }
                 else throw new Error("User not found");
               
@@ -51,30 +52,25 @@ export const {handlers ,signIn,signOut,auth} = NextAuth({
       ],
       adapter:PrismaAdapter(prisma),
       secret: process.env.AUTH_SECRET,
-      pages:{signIn:"/buy",signOut:"/auth/login",newUser:"/dashboard",error:"/error"},
       session:{
         strategy:"jwt" as const,
-        maxAge:24*60*60,
-        updateAge:60*60
+        maxAge:60*60*24*15,
+        updateAge:60*60*5
       },callbacks: {
-      async jwt({ token, user }) {
+      async jwt({ token, user,trigger,session }) {
         if (user) {
           token.id = user.id ??"";
           token.role = user.role;
+          token.emailVerified =user.emailVerified;
         }
+        if(trigger === "update" && session.emailVerified !== undefined) token.emailVerified = session.emailVerified
         return token;
       },
-      async session({ session }) {
-        const user = await prisma.user.findFirst({
-          where:{
-            email:session.user.email || undefined
-          },
-          select:{id:true,role:true,emailVerified:true}
-        })
-        if(user){
-          session.user.id = user.id;
-          session.user.role = user.role;
-          session.user.emailVerified = user.emailVerified
+      async session({ session,token }) {
+        if(token){
+          session.user.id = token.id;
+          session.user.role = token.role;
+          session.user.emailVerified = token.emailVerified
         }
         return session;
       }
@@ -94,5 +90,11 @@ export const {handlers ,signIn,signOut,auth} = NextAuth({
                 })
             }
             console.log("User: ",user.email," updated!")
-        }},
+        },
+        async signIn({user}){
+            console.log("New signIn by the user: ",user.email)
+        }
+      },
+      pages:{signIn:"/dashboard",signOut:"/auth/login",newUser:"/dashboard",error:"/error"}
+
 })

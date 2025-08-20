@@ -1,4 +1,4 @@
-import { propertyMI } from "@/app/utils/forms_utils";
+import { propertyMI } from "@/app/(pages)/(utils)/utils/forms_utils";
 
 
 export default function BaseForm({

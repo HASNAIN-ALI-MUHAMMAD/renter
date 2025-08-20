@@ -1,10 +1,19 @@
+"use client"
 import Logo from "./Logo";
-import { UserComp } from "./Userinfo";
 import {  ReactNode } from "react";
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider'
+import Image from "next/image";
+import { CircleUserRound } from "lucide-react";
+import Link from "next/link";
+import { useUser } from "../utils/user_info._utils";
+import { usePathname } from "next/navigation";
+
 
 export default function TopBar(){
+    const pathname = usePathname()
+    const {session,status} = useUser()
+
     return(
         <div className="bg-gray-600 p-2 h-12 flex flex-row justify-between">
             <div className=" flex flex-row gap-5"> 
@@ -28,7 +37,7 @@ export default function TopBar(){
                 <Logo/>
             </div>
             <div className=" flex flex-row items-center">
-                <UserComp/>
+                <AccountTB email={session?.user?.email || ""} image={session?.user?.image || ""} status={status} />
             </div>
         </div>
     )
@@ -42,3 +51,32 @@ export function TopBarButton({onClick,children,link}:{onClick?:()=>void,children
     )
 }
 
+function AccountTB({email,image,status}:{email:string,image:string,status:"loading"|"unauthenticated"|"authenticated"}){
+    if(status === "loading"){
+        return(
+            <div className="w-full h-full flex flex-row items-center justify-center">
+                Loading...
+            </div>
+        )
+    }
+    else if(status === "unauthenticated"){
+        return(
+            <div className="w-full h-full flex flex-row items-center justify-center">
+                <TopBarButton link="/auth/login">
+                    Login/Signup
+                </TopBarButton>
+            </div>
+        )
+    }
+    return(
+        <div className="w-full h-full flex flex-row items-center justify-center p-2">
+            <Link href={"/dashboard"} className="w-max h-max bg-gray-600 rounded-full hover:bg-gray-500 focus:outline-2 focus:outline-gray-800" >
+                {
+                image ? 
+                <Image src={image} alt="profileImageTopbar" width="30" height="30" className="rounded-full w-10"/>:
+                <CircleUserRound width={30} height={30} className="rounded-full hover:text-gray-800 text-gray-900" />
+                }
+            </Link>
+        </div>
+    )
+}

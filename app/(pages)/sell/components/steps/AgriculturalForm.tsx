@@ -1,4 +1,4 @@
-import { AgriculturalI } from "@/app/utils/forms_utils";
+import {  AgriculturalI} from "@/app/(pages)/(utils)/utils/forms_utils";
 
 type Props = {
   data: AgriculturalI;

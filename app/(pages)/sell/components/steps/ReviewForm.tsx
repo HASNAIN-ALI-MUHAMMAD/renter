@@ -1,4 +1,5 @@
-import { propertyMI,LandI,HouseI,AgriculturalI } from "@/app/utils/forms_utils";
+import { propertyMI,LandI,HouseI,AgriculturalI } from "@/app/(pages)/(utils)/utils/forms_utils";
+
 interface ReviewFormProps {
   formData:propertyMI | LandI | HouseI |AgriculturalI;
   onBack: () => void;

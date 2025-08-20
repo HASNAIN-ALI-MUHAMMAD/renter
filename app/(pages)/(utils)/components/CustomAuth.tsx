@@ -6,10 +6,12 @@ import { spData } from "../utils/auth_utils"
 import { siData } from "../utils/auth_utils"
 import { validateSignIn } from "../utils/auth_utils"
 import { validateSignUp } from "../utils/auth_utils"
+import { useRouter } from "next/navigation"
 
 export default function CustomAuth(){
     const [formState,setFormState] = useState("signUp")
     const [loading,setLoading] = useState<string>("")
+    const router = useRouter()
 
     const handelStateChange  = (btn:string)=>{
         if(btn === "signIn") {
@@ -47,7 +49,7 @@ export default function CustomAuth(){
             </div>
             <div>
                 {
-                    formState === "signUp" ? <SignUp/> : <SignIn/>
+                    formState === "signUp" ? <SignUp redirect={()=>router.push("/dashboard?verified=false")}/> : <SignIn/>
 
                 }
             </div>
@@ -58,7 +60,7 @@ export default function CustomAuth(){
 
 // signup form function...
 
-function SignUp(){
+function SignUp({redirect}:{redirect:()=>void}){
     const [spData,setSpData] = useState<spData>({
         email:"",
         password:"",
@@ -68,7 +70,7 @@ function SignUp(){
     const handleSubmit = (e:FormEvent,data:spData)=>{
         e.preventDefault()
         try {
-            const res = Promise.resolve(validateSignUp(data))
+            const res = Promise.resolve(validateSignUp(data,redirect))
             res.then((data)=>{
                 console.log(data)
                 if(data.error) return alert(data.error)
@@ -130,9 +132,14 @@ function SignIn(){
         e.preventDefault()
         try {
             const res = Promise.resolve(validateSignIn(data))
-            res.then((val)=>console.log(val.message || val.error))
+            res.then((data)=>{
+                console.log(data)
+                if(data.error) return alert(data.error)
+                else if(data.message) return alert(data.message)
+            })
         } catch (err) {
             console.log(err)
+            alert(err)
         }
         console.log("------Data to submit------")
         console.log(siData)
